@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nuestra semana</title>
+<meta name="apple-mobile-web-app-title" content="Nuestra semana">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3F5F1; --surface:#FFFFFF; --ink:#1D2A23; --muted:#5E6B63; --line:#DCE2DC;
+  --green:#2F6B4F; --green-soft:#E3EFE7; --him:#2E5C8A; --him-soft:#E4EDF6;
+  --her:#A3476B; --her-soft:#F6E6ED; --kid:#C07419; --kid-soft:#FBEBD7;
+  --thaw:#1F6F8B; --thaw-soft:#DDF0F6; --done:#9AA59E;
+  --display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --text:"Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#141A17; --surface:#1D2521; --ink:#E8EEEA; --muted:#A3B0A8; --line:#2F3A34;
+    --green:#7CC29C; --green-soft:#21362B; --him:#8DB7E2; --him-soft:#1E2C3A;
+    --her:#E49BB8; --her-soft:#3A2330; --kid:#F0B266; --kid-soft:#3A2B18;
+    --thaw:#7FCBE3; --thaw-soft:#183039; --done:#66726B; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141A17; --surface:#1D2521; --ink:#E8EEEA; --muted:#A3B0A8; --line:#2F3A34;
+  --green:#7CC29C; --green-soft:#21362B; --him:#8DB7E2; --him-soft:#1E2C3A;
+  --her:#E49BB8; --her-soft:#3A2330; --kid:#F0B266; --kid-soft:#3A2B18;
+  --thaw:#7FCBE3; --thaw-soft:#183039; --done:#66726B; color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--text);font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--green);outline-offset:2px;border-radius:6px}
+main{max-width:620px;margin:0 auto;padding:12px 16px 110px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.15}
+h1{font-size:2.1rem;font-weight:800;letter-spacing:-0.02em}
+h2{font-size:1.25rem;font-weight:700;margin:26px 0 10px}
+h3{font-size:1.05rem;font-weight:700}
+.muted{color:var(--muted)}
+.small{font-size:.88rem}
+
+/* day strip */
+.strip{display:flex;gap:6px;overflow-x:auto;padding:4px 0 10px;margin:0 -16px;padding-left:16px;padding-right:16px;scrollbar-width:none}
+.strip::-webkit-scrollbar{display:none}
+.day{flex:0 0 auto;width:52px;border:1.5px solid var(--line);background:var(--surface);border-radius:14px;padding:6px 0 7px;text-align:center;cursor:pointer}
+.day b{display:block;font-family:var(--display);font-size:1.35rem;line-height:1.1}
+.day span{font-size:.78rem;color:var(--muted)}
+.day[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:var(--bg)}
+.day[aria-pressed="true"] span{color:var(--bg)}
+.day.today:not([aria-pressed="true"]){border-color:var(--green)}
+
+.datehead{margin:8px 0 4px}
+.datehead .k{font-family:var(--display);font-weight:700;color:var(--green);font-size:1rem}
+
+.thaw{margin:14px 0 4px;background:var(--thaw-soft);border-left:5px solid var(--thaw);border-radius:4px 14px 14px 4px;padding:12px 14px}
+.thaw h3{color:var(--thaw);font-size:1rem;margin-bottom:4px}
+.thaw ul{margin:0;padding-left:18px}
+
+.meal{display:block;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px;margin:10px 0;cursor:pointer}
+.meal .when{font-size:.85rem;color:var(--muted)}
+.meal h3{font-size:1.2rem;margin:2px 0 8px}
+.portions{display:flex;flex-wrap:wrap;gap:6px}
+.pill{font-size:.82rem;border-radius:999px;padding:3px 10px;white-space:nowrap}
+.p-him{background:var(--him-soft);color:var(--him)}
+.p-her{background:var(--her-soft);color:var(--her)}
+.p-kid{background:var(--kid-soft);color:var(--kid)}
+.meal .go{float:right;color:var(--green);font-size:.85rem;font-weight:700}
+.empty{border:1.5px dashed var(--line);border-radius:18px;padding:14px 16px;color:var(--muted);margin:10px 0}
+.kidline{display:flex;gap:10px;align-items:baseline;padding:10px 14px;border-radius:14px;background:var(--kid-soft);color:var(--ink);margin-top:10px}
+.kidline b{color:var(--kid);white-space:nowrap}
+
+.train{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:420px){.train{grid-template-columns:1fr}}
+.tcard{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;border-top:5px solid var(--c)}
+.tcard .who{font-family:var(--display);font-weight:700;color:var(--c)}
+.tcard h3{margin:2px 0 6px;font-size:1.15rem}
+.tcard ul{margin:6px 0 10px;padding-left:18px;font-size:.9rem}
+.check{display:flex;align-items:center;gap:8px;border:1.5px solid var(--c);color:var(--c);background:transparent;border-radius:999px;padding:6px 12px;cursor:pointer;font-weight:700;font-size:.9rem}
+.check[aria-pressed="true"]{background:var(--c);color:var(--surface)}
+.linkbtn{background:none;border:0;color:var(--green);font-weight:700;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+
+.skip{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:-2px 0 12px 4px}
+.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 12px;font-size:.85rem;font-weight:700;cursor:pointer}
+.chip.main{border-color:var(--green);color:var(--green)}
+.offcard{background:var(--surface);border:1.5px dashed var(--muted);border-radius:18px;padding:14px 16px;margin:10px 0}
+.offcard h3{font-size:1.2rem;margin:2px 0 6px}
+.offcard input{width:100%;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:8px 10px;font:inherit;margin:4px 0 10px}
+.offcard .when{font-size:.85rem;color:var(--muted)}
+
+/* recipes list */
+.rgroup{margin-top:18px}
+.rrow{display:flex;justify-content:space-between;gap:10px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:6px 0;cursor:pointer}
+.rrow span{color:var(--muted);font-size:.85rem;white-space:nowrap}
+
+/* sheet */
+.sheet{position:fixed;inset:0;z-index:30;background:var(--bg);overflow-y:auto;padding:calc(env(safe-area-inset-top,0px) + 8px) 0 calc(env(safe-area-inset-bottom,0px) + 30px)}
+.sheet[hidden]{display:none}
+.sheet .in{max-width:620px;margin:0 auto;padding:0 16px}
+.sheetbar{position:sticky;top:0;display:flex;justify-content:flex-end;padding:6px 0;background:var(--bg)}
+.close{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;cursor:pointer;font-weight:700}
+.sheet h1{font-size:1.8rem;margin:4px 0 4px}
+.wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.95rem}
+th,td{padding:8px 8px;text-align:left;border-bottom:1px solid var(--line)}
+thead th{font-family:var(--display);font-size:.9rem}
+th.h-him{color:var(--him)} th.h-her{color:var(--her)} th.h-kid{color:var(--kid)}
+.ing{columns:2;column-gap:20px;padding-left:18px;margin:0}
+@media (max-width:420px){.ing{columns:1}}
+.steps{padding-left:22px;margin:0}
+.steps li{margin:0 0 10px}
+.note{background:var(--kid-soft);border-radius:14px;padding:12px 14px;margin-top:16px}
+.note b{color:var(--kid)}
+.kidv{margin-top:8px;font-size:.88rem;color:var(--kid);font-weight:700}
+.kidrec{background:var(--kid-soft);border-radius:18px;padding:14px 16px;margin-top:18px}
+.kidrec h2{margin:2px 0 6px;color:var(--kid)}
+.kidrec ul,.kidrec ol{padding-left:20px;margin:6px 0}
+.kidrec li{margin-bottom:6px}
+.tips{background:var(--kid-soft);border-radius:18px;padding:12px 16px;margin:14px 0}
+.tips summary{font-family:var(--display);font-weight:700;color:var(--kid);cursor:pointer}
+.tips ul{padding-left:20px;margin:8px 0 2px}
+.tips li{margin-bottom:6px}
+.flag{background:var(--her-soft);border-radius:14px;padding:12px 14px;margin:10px 0}
+
+/* shopping */
+.add{display:flex;gap:8px;margin:10px 0 4px}
+.add input{flex:1;min-width:0;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:10px 12px;font:inherit}
+.add input.q{flex:0 0 92px}
+.btn{border:0;background:var(--green);color:var(--bg);border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--green);border:1.5px solid var(--green)}
+.sec{font-family:var(--display);font-weight:700;margin:18px 0 4px;color:var(--green)}
+.item{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--line);cursor:pointer;width:100%;background:none;border-left:0;border-right:0;border-top:0;text-align:left}
+.box{flex:0 0 24px;height:24px;border:2px solid var(--green);border-radius:7px;display:grid;place-items:center;font-size:15px;color:var(--bg)}
+.item.done .box{background:var(--green)}
+.item.done .nm{text-decoration:line-through;color:var(--done)}
+.item .qq{margin-left:auto;color:var(--muted);font-size:.88rem;white-space:nowrap}
+.status{font-size:.85rem;color:var(--muted);margin:6px 0}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+
+/* progress */
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:440px){.pgrid{grid-template-columns:1fr}}
+.pcard{background:var(--surface);border:1px solid var(--line);border-top:5px solid var(--c);border-radius:18px;padding:14px}
+.pcard .who{font-family:var(--display);font-weight:700;color:var(--c)}
+.pcard .big{font-family:var(--display);font-weight:800;font-size:2.2rem;line-height:1.1;margin-top:2px}
+.pcard .big small{font-size:1rem;font-weight:700}
+.kv{display:grid;grid-template-columns:1fr auto;gap:3px 10px;font-size:.92rem;margin:10px 0}
+.kv span{color:var(--muted)}
+.deltas{font-size:.88rem;margin:6px 0;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.deltas div{width:100%;color:var(--muted)}
+.dl{border-radius:999px;padding:2px 9px;font-weight:700;background:var(--bg)}
+.dl.good{background:var(--green-soft);color:var(--green)}
+.dl.bad{background:var(--kid-soft);color:var(--kid)}
+.spark{width:100%;height:auto;margin-top:6px}
+.hin{width:70px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:4px 6px;font:inherit;margin-left:6px}
+.medform{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px}
+.seg{display:flex;gap:6px;margin-bottom:12px}
+.seg button{flex:1;border:1.5px solid var(--line);background:var(--bg);border-radius:12px;padding:8px;font-weight:700;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--c);border-color:var(--c);color:var(--surface)}
+.fgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.fgrid label{display:flex;flex-direction:column;font-size:.85rem;color:var(--muted);gap:3px}
+.fgrid input{width:100%;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:9px 10px;font:inherit;min-width:0}
+.fgrid .full{grid-column:1 / -1}
+.calc{margin:12px 0;font-size:.92rem}
+.hist{font-size:.9rem}
+.hrow{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.hrow .d{width:58px;color:var(--muted)}
+.hrow .x{margin-left:auto;background:none;border:0;color:var(--muted);cursor:pointer;font-size:1.1rem;padding:2px 6px}
+
+/* tab bar */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;padding:6px 8px calc(env(safe-area-inset-bottom,0px) + 6px)}
+nav.tabs .row{display:flex;max-width:620px;width:100%}
+nav.tabs a{flex:1;text-align:center;text-decoration:none;color:var(--muted);font-family:var(--display);font-weight:700;font-size:.86rem;padding:9px 2px;border-radius:12px}
+nav.tabs a[aria-current="page"]{color:var(--green);background:var(--green-soft)}
+section[hidden]{display:none}
+@media (prefers-reduced-motion: no-preference){.meal,.day,.item{transition:background .15s, border-color .15s}}
+</style>
+</head>
+<body>
+<main>
+  <section id="v-hoy" aria-label="Hoy"></section>
+  <section id="v-recetas" hidden></section>
+  <section id="v-entreno" hidden></section>
+  <section id="v-compra" hidden></section>
+  <section id="v-progreso" hidden></section>
+</main>
+<div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheet-title"><div class="in" id="sheet-in"></div></div>
+<nav class="tabs" aria-label="Secciones"><div class="row">
+  <a href="#hoy" data-v="hoy">Hoy</a>
+  <a href="#recetas" data-v="recetas">Recetas</a>
+  <a href="#entreno" data-v="entreno">Entreno</a>
+  <a href="#compra" data-v="compra">Compra</a>
+  <a href="#progreso" data-v="progreso">Progreso</a>
+</div></nav>
+<script>
+const DATA = {"R": {"merluza23": {"day": "Lunes 23", "meal": "Cena los tres", "name": "Merluza al horno", "time": "15 min", "ing": ["450 g lomos de merluza", "1 limón", "25 g aceite de oliva virgen extra", "Pan integral", "Sal y perejil"], "heads": ["Él", "Ella", "Niño"], "rows": [["Merluza", "220 g", "180 g", "50 g"], ["Pan integral", "40 g", "30 g", "20 g"], ["Aceite", "10 g", "10 g", "5 g"]], "steps": ["Precalienta el horno a 200 °C.", "Coloca los lomos sobre papel de horno con unas gotas de limón y de aceite.", "Hornea 10–12 minutos (8 si son finos).", "Reparte el resto del aceite en crudo según la tabla. Sala solo lo de los adultos."], "nino": "Desmiga la merluza revisando espinas, con su aceite crudo y el pan en trocitos."}, "pollo-pisto": {"day": "Martes 24", "meal": "Comida adultos", "name": "Pollo a la plancha con pisto y arroz integral", "time": "35 min", "ing": ["350 g pechuga de pollo fileteada", "120 g arroz integral", "1 calabacín", "1 pimiento rojo", "1 pimiento verde", "1 cebolla", "200 g tomate triturado", "20 g aceite", "Sal, pimienta y orégano"], "heads": ["Él", "Ella"], "rows": [["Pollo", "200 g", "150 g"], ["Arroz integral (crudo)", "70 g", "50 g"], ["Pisto", "250 g", "250 g"], ["Aceite", "10 g", "10 g"]], "steps": ["Pon el arroz integral a cocer en agua abundante 25–30 minutos (mira el paquete) y escúrrelo.", "Pica la cebolla y los pimientos; pocha con el aceite a fuego medio-bajo 10 minutos.", "Añade el calabacín en dados y cocina 8 minutos. Incorpora el tomate y deja 10 minutos tapado.", "Salpimienta el pollo y hazlo en la plancha bien caliente 3 minutos por lado.", "Pesa y sirve según la tabla."], "nino": null}, "salmon": {"day": "Martes 24", "meal": "Cena los tres", "name": "Salmón al horno con brócoli y patata", "time": "35 min", "ing": ["400 g lomos de salmón", "1 brócoli grande (≈500 g)", "450 g patata", "1 limón", "15 g aceite", "Sal y eneldo"], "heads": ["Él", "Ella", "Niño"], "rows": [["Salmón", "180 g", "150 g", "50 g"], ["Brócoli", "200 g", "200 g", "80 g"], ["Patata", "200 g", "150 g", "80 g"], ["Aceite", "5 g", "5 g", "5 g"]], "steps": ["Horno a 200 °C. Pela la patata, córtala en rodajas de 1 cm y cuécela 10 minutos.", "Cuece el brócoli en ramilletes al vapor 6–7 minutos.", "Hornea el salmón con unas gotas de limón 12–14 minutos.", "Aliña en crudo con el aceite. El salmón ya es graso: por eso lleva menos aceite."], "nino": "Salmón sin piel ni espinas, patata chafada con su aceite y brócoli tierno en trocitos."}, "solomillo": {"day": "Miércoles 25", "meal": "Comida adultos", "name": "Solomillo de cerdo con ensalada y patata", "time": "25 min", "ing": ["400 g solomillo de cerdo", "350 g patata", "1 bolsa ensalada mezcla", "2 tomates", "1 pepino", "½ cebolla", "20 g aceite", "Vinagre, sal, pimienta y ajo en polvo"], "heads": ["Él", "Ella"], "rows": [["Solomillo", "220 g", "180 g"], ["Patata", "200 g", "150 g"], ["Ensalada", "200 g", "200 g"], ["Aceite", "10 g", "10 g"]], "steps": ["Lava las patatas, pínchalas y hazlas en el microondas 8–10 minutos (o asadas al horno 35 minutos).", "Salpimienta el solomillo y dóralo en sartén 2 minutos por cada cara.", "Termina en el horno a 190 °C 12–15 minutos. Reposa 5 minutos y corta en medallones.", "Prepara la ensalada con tomate, pepino y cebolla, y aliña con el aceite pesado."], "nino": null}, "garbanzos-espinacas": {"day": "Jueves 26", "meal": "Cena los tres", "name": "Garbanzos con espinacas, zanahoria y huevo", "time": "20 min", "ing": ["430 g garbanzos cocidos escurridos", "300 g espinacas frescas", "2 zanahorias", "½ cebolla", "1 diente de ajo", "½ cdta. comino", "½ cdta. pimentón dulce", "4 huevos", "25 g aceite"], "heads": ["Él", "Ella", "Niño"], "rows": [["Garbanzos", "200 g", "170 g", "60 g"], ["Huevo cocido", "2", "1", "½"], ["Verdura salteada", "150 g", "150 g", "60 g"], ["Aceite", "10 g", "10 g", "5 g"]], "steps": ["Cuece los huevos 10 minutos, enfríalos y pélalos.", "Sofríe la cebolla y la zanahoria picadas con el aceite 6–7 minutos.", "Añade ajo, comino y pimentón y remueve 30 segundos.", "Incorpora los garbanzos enjuagados y un chorrito de agua; saltea 3 minutos.", "Añade las espinacas hasta que se reduzcan. Separa lo del niño antes de salar y sirve con el huevo."], "nino": "Garbanzos chafados con tenedor y huevo bien cocido picado fino."}, "merluza-papillote": {"day": "Jueves 26", "meal": "Comida adultos", "name": "Merluza en papillote con verduras y patata", "time": "25 min", "ing": ["450 g lomos de merluza", "350 g patata", "1 calabacín", "1 zanahoria", "½ cebolla", "1 limón", "20 g aceite", "Sal, pimienta y perejil", "Papel de horno"], "heads": ["Él", "Ella"], "rows": [["Merluza", "250 g", "200 g"], ["Patata", "200 g", "150 g"], ["Verduras", "250 g", "250 g"], ["Aceite", "10 g", "10 g"]], "steps": ["Horno a 200 °C. Corta la patata en rodajas de 3 mm y precuécela 4 minutos en el microondas tapada.", "Corta calabacín, zanahoria y cebolla en tiras finas.", "Haz dos paquetes: patata, verduras, merluza, limón, sal, pimienta y el aceite de cada uno.", "Cierra bien doblando los bordes y hornea 15 minutos."], "nino": null}, "tortilla": {"day": "Miércoles 25", "meal": "Cena los tres", "name": "Tortilla de calabacín con tomate aliñado", "time": "25 min", "ing": ["6 huevos", "1 calabacín", "½ cebolla", "3 tomates (≈450 g)", "25 g aceite", "Pan integral", "Sal y orégano"], "heads": ["Él", "Ella", "Niño"], "rows": [["Tortilla", "3 huevos (½ tortilla)", "2 huevos (⅓)", "1 huevo (⅙)"], ["Tomate", "200 g", "200 g", "60 g"], ["Pan integral", "50 g", "40 g", "20 g"]], "steps": ["Corta el calabacín en dados y la cebolla en juliana fina; pocha con 1 cda. de aceite 10 minutos.", "Bate los huevos y mezcla con la verdura escurrida.", "Cuaja en sartén antiadherente 3–4 minutos, da la vuelta y otros 2–3 minutos. Bien hecha por dentro.", "Tomate en rodajas con orégano, sal y el resto del aceite (al niño, sin sal)."], "nino": "Huevo bien cuajado; tomate pelado en trocitos y pan."}, "ensalada-garbanzos": {"day": "Viernes 27", "meal": "Comida adultos", "name": "Ensalada de garbanzos, atún y huevo", "time": "15 min", "ing": ["350 g garbanzos cocidos escurridos", "3 latas atún al natural", "3 huevos", "2 tomates", "1 pepino", "1 pimiento rojo", "½ cebolla", "20 g aceite", "Vinagre y sal"], "heads": ["Él", "Ella"], "rows": [["Garbanzos", "200 g", "150 g"], ["Atún escurrido", "90 g", "60 g"], ["Huevo cocido", "2", "1"], ["Verduras", "200 g", "200 g"], ["Aceite", "10 g", "10 g"]], "steps": ["Cuece los huevos 10 minutos, enfríalos y pélalos.", "Corta en dados tomate, pepino, pimiento y cebolla.", "Mezcla con los garbanzos enjuagados y el atún escurrido.", "Sirve con el huevo en cuartos y aliña con el aceite pesado, vinagre y sal."], "nino": null}, "dorada": {"day": "Viernes 27", "meal": "Cena los tres", "name": "Dorada al horno con judías verdes y patata", "time": "40 min", "ing": ["2 doradas grandes limpias (≈410 g de carne)", "500 g judías verdes", "450 g patata", "1 limón", "2 dientes de ajo", "25 g aceite", "Sal y perejil"], "heads": ["Él", "Ella", "Niño"], "rows": [["Dorada (limpia)", "200 g", "160 g", "50 g"], ["Judías verdes", "200 g", "200 g", "80 g"], ["Patata", "200 g", "150 g", "80 g"], ["Aceite", "10 g", "10 g", "5 g"]], "steps": ["Horno a 200 °C. Patata en rodajas finas en la bandeja con unas gotas de aceite; hornea 15 minutos.", "Pon las doradas encima con limón dentro; hornea 18–20 minutos.", "Cuece las judías troceadas 8–10 minutos y saltéalas 2 minutos con el ajo laminado.", "Reparte el resto del aceite en crudo. Sala solo lo de los adultos."], "nino": "Sin piel ni espinas, dorada desmigada, judías muy tiernas en trocitos y patata chafada."}, "pollo-horno": {"day": "Lunes 30", "meal": "Comida adultos", "name": "Pollo al horno con verduras asadas", "time": "45 min", "ing": ["400 g contramuslos de pollo sin piel", "400 g calabaza", "1 pimiento rojo", "1 cebolla", "20 g aceite", "Pan integral", "Sal, pimienta, pimentón y romero"], "heads": ["Él", "Ella"], "rows": [["Pollo", "220 g", "180 g"], ["Verduras asadas", "300 g", "300 g"], ["Pan integral", "40 g", "30 g"], ["Aceite", "10 g", "10 g"]], "steps": ["Horno a 200 °C. Trocea calabaza, pimiento y cebolla en trozos grandes y mézclalos con la mitad del aceite y hierbas.", "Salpimienta el pollo, frótalo con pimentón y el resto del aceite y ponlo sobre las verduras.", "Hornea 35–40 minutos, dando la vuelta a mitad. Sin jugos rosados al pinchar."], "nino": null}, "crema-bacalao": {"day": "Lunes 30", "meal": "Cena los tres", "name": "Crema de puerro y zanahoria con bacalao", "time": "35 min", "ing": ["2 puerros", "4 zanahorias", "1 patata (≈150 g)", "450 g lomos de bacalao desalado", "25 g aceite", "Pan integral", "Pimienta"], "heads": ["Él", "Ella", "Niño"], "rows": [["Crema", "400 ml", "350 ml", "180 ml"], ["Bacalao", "200 g", "170 g", "50 g"], ["Pan integral", "40 g", "30 g", "20 g"], ["Aceite", "10 g", "10 g", "5 g"]], "steps": ["Descongela el bacalao en la nevera la noche anterior.", "Rehoga el puerro 3 minutos con 1 cda. de aceite; añade zanahoria y patata, cubre con agua y cuece 20 minutos. Tritura.", "Bacalao a la plancha o al horno (200 °C) 8–10 minutos. No añadas sal: ya la tiene.", "Reparte el resto del aceite en crudo."], "nino": "Desmiga revisando espinas. Si lo notas salado, desálalo un poco más en agua antes de cocinarlo."}, "salmon-plancha": {"day": "Miércoles 25", "meal": "Comida adultos", "name": "Salmón a la plancha con ensalada y patata", "time": "20 min", "ing": ["2 raciones de salmón (las que sobraron)", "350 g patata", "1 bolsa de ensalada mezcla", "2 tomates", "1 pepino", "½ cebolla", "10 g aceite", "Limón, vinagre, sal y pimienta"], "heads": ["Él", "Ella"], "rows": [["Salmón", "1 ración (la más grande)", "1 ración"], ["Patata", "200 g", "150 g"], ["Ensalada", "200 g", "200 g"], ["Aceite", "5 g", "5 g"]], "steps": ["Lava las patatas, pínchalas y hazlas en el microondas 8–10 minutos.", "Seca bien el salmón y ponlo en la plancha muy caliente con la piel hacia abajo, sin aceite, 4 minutos.", "Dale la vuelta y hazlo 2–3 minutos más, según el grosor.", "Prepara la ensalada con tomate, pepino y cebolla y aliña con el aceite pesado, vinagre y sal. El salmón ya es graso: por eso lleva menos aceite."], "nino": null}, "albondigas": {"day": "Sábado 28", "meal": "Comida los tres", "name": "Albóndigas de pollo en salsa de tomate con arroz", "time": "45 min", "ing": ["450 g pollo picado", "1 huevo", "30 g pan rallado", "1 diente de ajo", "Perejil fresco", "1 cebolla", "1 zanahoria", "400 g tomate triturado", "150 g arroz", "20 g aceite", "Sal para los adultos"], "heads": ["Él", "Ella", "Niño"], "rows": [["Albóndigas (en crudo)", "220 g", "180 g", "50 g"], ["Arroz (crudo)", "70 g", "50 g", "30 g"], ["Salsa de tomate", "150 g", "150 g", "60 g"], ["Aceite (en la receta)", "10 g", "10 g", "5 g"]], "steps": ["Mezcla el pollo picado con el huevo, el pan rallado, el ajo y el perejil muy picados. Sin sal: así vale para el niño.", "Forma bolitas del tamaño de una nuez y dóralas en la sartén con 1 cda. de aceite (o al horno, 200 °C, 12 minutos).", "En una cazuela, pocha la cebolla y la zanahoria picadas con el resto del aceite 8 minutos.", "Añade el tomate triturado y cuece 10 minutos. Tritura la salsa si al niño le gusta fina.", "Mete las albóndigas en la salsa y cuece 10 minutos más a fuego suave.", "Mientras, cuece el arroz en agua 15–18 minutos y escúrrelo. Sala solo los platos de los adultos."], "nino": "Albóndigas partidas en trocitos con su arroz y salsa. Comprueba que el pollo está bien hecho por dentro."}, "merluza-calabaza": {"day": "Sábado 28", "meal": "Cena los tres", "name": "Merluza al horno con calabaza asada y patata", "time": "40 min", "ing": ["2 filetes grandes de merluza (unos 450–500 g)", "500 g calabaza", "400 g patata", "1 limón", "25 g aceite", "Romero o tomillo", "Sal para los adultos"], "heads": ["Él", "Ella", "Niño"], "rows": [["Merluza", "220 g", "180 g", "50 g"], ["Calabaza", "150 g", "150 g", "60 g"], ["Patata", "150 g", "100 g", "70 g"], ["Aceite", "10 g", "10 g", "5 g"]], "steps": ["Precalienta el horno a 200 °C. Pela la calabaza y la patata y córtalas en dados de unos 2 cm.", "Mézclalas en la bandeja con 1 cda. de aceite y las hierbas, y hornea 25 minutos, removiendo a mitad.", "Coloca los filetes de merluza encima de la verdura con unas gotas de limón. Uno será para él; el otro se reparte entre ella y el niño.", "Hornea 10–12 minutos más (8 si son finos).", "Reparte el resto del aceite en crudo según la tabla. Sala solo lo de los adultos."], "nino": "Desmiga la merluza revisando espinas y chafa la calabaza y la patata con su aceite."}, "ternera": {"day": "Domingo 29", "meal": "Comida los tres", "name": "Ternera guisada con patata y zanahoria", "time": "1 h 30 min (35 min en olla exprés)", "ing": ["450 g ternera magra para guisar", "500 g patata", "3 zanahorias", "1 cebolla", "2 dientes de ajo", "1 cda. tomate triturado", "1 hoja de laurel", "20 g aceite", "Agua o caldo sin sal"], "heads": ["Él", "Ella", "Niño"], "rows": [["Ternera (en crudo)", "200 g", "160 g", "45 g"], ["Patata", "200 g", "150 g", "80 g"], ["Zanahoria", "80 g", "80 g", "40 g"], ["Aceite (en el guiso)", "10 g", "10 g", "5 g"]], "steps": ["Corta la ternera en dados pequeños. Para el niño, mejor algo más pequeños aún.", "Dórala en la cazuela con el aceite a fuego fuerte y resérvala.", "En la misma cazuela, pocha la cebolla, el ajo y la zanahoria en rodajas 8 minutos. Añade el tomate.", "Vuelve a meter la carne, cubre con agua, añade el laurel y cuece tapado a fuego suave 60 minutos (20 en olla exprés).", "Añade la patata en trozos y cuece 20–25 minutos más (8 en olla exprés), hasta que todo esté muy tierno.", "Separa la ración del niño y sala solo el resto."], "nino": "Desmenuza la carne muy fina con un tenedor y chafa la patata y la zanahoria con un poco de caldo."}, "revuelto": {"day": "Domingo 29", "meal": "Cena los tres", "name": "Revuelto de calabacín y champiñones", "time": "20 min", "ing": ["6 huevos", "1 calabacín", "250 g champiñones", "½ cebolla", "20 g aceite", "Pan integral", "Sal y perejil"], "heads": ["Él", "Ella", "Niño"], "rows": [["Huevos", "3", "2", "1"], ["Verduras", "150 g", "150 g", "50 g"], ["Pan integral", "50 g", "40 g", "20 g"], ["Aceite", "10 g", "5 g", "5 g"]], "steps": ["Limpia los champiñones y córtalos en láminas; el calabacín y la cebolla, en dados pequeños.", "Saltea la verdura con el aceite 8–10 minutos hasta que suelte el agua y se dore.", "Baja el fuego, añade los huevos batidos y remueve hasta que cuajen.", "Para el niño, sepárale su parte y déjala al fuego un poco más, hasta que esté bien cuajada. Sala solo lo de los adultos."], "nino": "Huevo bien cuajado, champiñón y calabacín picados muy finos, y pan en trocitos."}}, "D": {"2026-11-23": {"g": "Patatas guisadas con carne · Yogur", "c": null, "x": "merluza23"}, "2026-11-24": {"g": "Arroz con tomate · Tortilla · Fruta", "c": "pollo-pisto", "x": "salmon"}, "2026-11-25": {"g": "Puré de verduras · Pescado en salsa · Yogur", "c": "salmon-plancha", "x": "tortilla"}, "2026-11-26": {"g": "Coliflor con patatas · Chuleta de sajonia · Fruta", "c": "merluza-papillote", "x": "garbanzos-espinacas"}, "2026-11-27": {"g": "Sopa de picadillo · Muslitos de pollo · Yogur", "c": "ensalada-garbanzos", "x": "dorada"}, "2026-11-28": {"g": null, "c": "albondigas", "x": "merluza-calabaza"}, "2026-11-29": {"g": null, "c": "ternera", "x": "revuelto"}, "2026-11-30": {"g": "Pasta boloñesa · Yogur", "c": "pollo-horno", "x": "crema-bacalao"}}, "T": {"2026-11-23": ["Salmón para la cena del martes, si está congelado"], "2026-11-25": ["Merluza para la comida del jueves, si está congelada"], "2026-11-26": ["Doradas para la cena del viernes, si las congelaste"], "2026-11-27": ["Merluza para la cena del sábado, si es congelada"], "2026-11-28": ["Ternera para la comida del domingo, si está congelada"], "2026-11-29": ["Bacalao para la cena del lunes", "Contramuslos de pollo para la comida del lunes, si los congelaste"]}, "X": {"A": {"name": "Fuerza A", "ex": [["Dominadas pronas", "4 × 5–10", "2 min", "Si no llegas a 5: con banda o solo bajadas lentas de 5 s"], ["Sentadilla búlgara con mancuernas", "4 × 8–12 / pierna", "90 s", "Pie atrás en sofá o silla. Tempo 3-1-1"], ["Fondos en paralelas", "4 × 6–12", "2 min", "Tronco algo inclinado; bajar hasta 90° de codo"], ["Peso muerto rumano a una pierna", "3 × 10–12 / pierna", "75 s", "Cadera nivelada; mancuerna en la mano contraria"], ["Remo invertido en TRX", "3 × 10–15", "60 s", "Más horizontal, más difícil"], ["Rueda abdominal de rodillas", "3 × 6–12", "60 s", "Sin hundir la lumbar"], ["Comba (opcional)", "6 × 30 s / 30 s", "—", "Para terminar"]]}, "B": {"name": "Fuerza B", "ex": [["Flexiones con pies elevados", "4 × 8–15", "90 s", "O con banda en la espalda"], ["Dominadas supinas", "3 × 6–10", "2 min", "Mismas ayudas que en A"], ["Zancada atrás con mancuernas", "3 × 10–12 / pierna", "75 s", "Tempo 3-1-1"], ["Press militar de pie con mancuernas", "3 × 10–15", "75 s", "Glúteo apretado, sin arquear"], ["Hip thrust a una pierna", "3 × 10–15 / pierna", "60 s", "Espalda en el sofá; pausa 2 s arriba"], ["Curl de bíceps + extensión de tríceps en TRX", "3 × 12 + 12", "60 s", "Superserie, sin balanceo"], ["Elevaciones de piernas colgado", "3 × 8–12", "60 s", "Rodillas dobladas si cuesta"]]}, "warm": "2 min de comba suave, 10 sentadillas, 10 rotaciones de hombro con banda, 10 retracciones escapulares colgado y 1 serie ligera del primer ejercicio. Tempo 3-1-1: 3 s bajando, 1 s de pausa, 1 s subiendo.", "prog": "Deja 1–2 repeticiones en reserva. Cuando completes todas las series en el máximo de repeticiones, progresa así: más peso si queda margen, bajar en 4 s, pausa de 2 s en el punto difícil, añadir una banda y, en dominadas y fondos, mochila con peso. Cada 5.ª semana, descarga con la mitad de series.", "f0": [["Respiración diafragmática", "5 min, 1–2 veces al día", "Tumbada boca arriba, rodillas dobladas. Inspira hinchando costillas y abdomen; espira lento."], ["Conexión abdomen y suelo pélvico", "10 repeticiones, 2–3 veces al día", "Al espirar, cierra y eleva suavemente el suelo pélvico y mete un poco el ombligo. Suelta del todo al inspirar."], ["Paseo", "Empieza con 10 min y suma unos 5 por semana", "Al ritmo que te encuentres bien."], ["Movilidad y postura", "A diario", "Rotaciones de hombro y cuello, espalda apoyada al dar el biberón, levantarte de la cama de lado."]], "f1": [["Puente de glúteo", "3 × 12"], ["Sentadilla con TRX", "3 × 10–12"], ["Remo en TRX, cuerpo bastante vertical", "3 × 10–12"], ["Flexión inclinada en pared o encimera", "3 × 8–10"], ["Bird dog", "3 × 8 / lado"], ["Deslizamiento de talón tumbada", "3 × 8 / lado"], ["Pallof press con banda", "3 × 10 / lado"]], "f2a": ["Sentadilla goblet 3 × 10–12", "Press de suelo con mancuernas 3 × 10–12", "Remo a una mano 3 × 10–12 / lado", "Peso muerto rumano 3 × 10–12", "Dominada asistida con banda 3 × 5–8"], "f2b": ["Zancada atrás 3 × 8–10 / pierna", "Press de hombro sentada 3 × 10–12", "Remo en TRX 3 × 10–12", "Hip thrust 3 × 12–15", "Plancha lateral con rodillas 3 × 20–30 s, si no hay diástasis"], "flags": "Para y consulta si notas pérdidas de orina, sensación de peso o bulto en la vagina, dolor en la cicatriz, sangrado que aumenta tras el ejercicio o que el abdomen se abomba en pico al hacer fuerza."}};
+const R = DATA.R, D = DATA.D, T = DATA.T, X = DATA.X;
+const KV = {
+  "salmon": {n:"Nuggets de salmón y brócoli", y:"6 nuggets (sobran para congelar)",
+    ing:["60 g de salmón ya cocinado, sin piel ni espinas","30 g de brócoli cocido muy picado","40 g de patata cocida","1 huevo batido","Pan rallado o copos de avena triturados","Spray de aceite de oliva"],
+    steps:["Chafa el salmón, el brócoli y la patata con un tenedor hasta tener una pasta; el brócoli tiene que quedar casi invisible.","Forma 6 nuggets planos, del tamaño de un dedo gordo.","Pásalos por huevo y luego por pan rallado. Pulveriza un poco de aceite.","Airfryer a 190 °C, 8–10 minutos, dando la vuelta a mitad, hasta que estén dorados."]},
+  "garbanzos-espinacas": {n:"Galletas de garbanzo y espinaca", y:"6 galletitas",
+    ing:["80 g de garbanzos cocidos (sepáralos antes de salar)","20 g de espinacas salteadas y bien escurridas","20 g de zanahoria rallada","1 cda. de copos de avena o harina","1 pizca de comino","1 cdta. de aceite","Yogur natural para mojar"],
+    steps:["Tritura o chafa los garbanzos con las espinacas, la zanahoria, la avena, el comino y el aceite.","Forma 6 galletitas planas, no bolas: aplastadas son más seguras a su edad.","Airfryer a 190 °C, 10–12 minutos, dando la vuelta a mitad.","Sírvelas templadas con un poco de yogur natural para mojar."]},
+  "tortilla": {n:"Muffins de tortilla con calabacín y queso", y:"3 muffins pequeños",
+    ing:["1 huevo","30 g de calabacín rallado y bien escurrido","10 g de queso rallado suave","1 cda. de leche entera"],
+    steps:["Bate el huevo con la leche, el calabacín y el queso.","Reparte en 3 moldes de silicona pequeños.","Airfryer a 160 °C, 10–12 minutos, hasta que un palillo salga limpio: el huevo tiene que quedar bien cuajado.","Desmolda y deja templar. Se pueden comer con la mano."]},
+  "dorada": {n:"Palitos de dorada, patata y judías verdes", y:"6 palitos",
+    ing:["50 g de dorada cocinada, sin piel ni espinas","60 g de patata cocida","20 g de judías verdes cocidas y trituradas","1 cdta. de aceite","1 huevo batido y pan rallado para rebozar","Spray de aceite"],
+    steps:["Desmiga la dorada revisando bien las espinas.","Cháfala con la patata, las judías trituradas y el aceite.","Forma 6 palitos alargados, fáciles de coger, y pásalos por huevo y pan rallado.","Pulveriza aceite y airfryer a 190 °C, 8–10 minutos, dando la vuelta a mitad."]},
+  "merluza-calabaza": {n:"Palitos de merluza crujientes con dip de calabaza", y:"Para 1 cena",
+    ing:["50 g de merluza cruda en tiras gruesas","1 huevo batido","Copos de avena triturados o pan rallado, con una pizca de pimentón dulce","60 g de calabaza asada de la receta","1 cda. de yogur natural","Spray de aceite"],
+    steps:["Seca las tiras de merluza y comprueba que no tienen espinas.","Pásalas por huevo y por la avena con pimentón. Pulveriza aceite.","Airfryer a 190 °C, 8–9 minutos, dando la vuelta a mitad.","Cháfala calabaza con el yogur para hacer una salsa naranja de mojar."]},
+  "revuelto": {n:"Tortitas de calabacín y zanahoria", y:"4 tortitas",
+    ing:["1 huevo","30 g de calabacín rallado y escurrido","20 g de zanahoria rallada","1½ cda. de harina o copos de avena","10 g de queso rallado suave"],
+    steps:["Mezcla todo hasta tener una masa espesa.","Pon 4 cucharadas de masa sobre papel de airfryer y aplástalas un poco.","Airfryer a 180 °C, 8–10 minutos, dando la vuelta a mitad, hasta que estén cuajadas y doradas.","Sírvelas en tiras con un poco de yogur o tomate natural rallado."]},
+  "crema-bacalao": {n:"Buñuelos de bacalao y zanahoria", y:"6 buñuelos aplastados",
+    ing:["50 g de bacalao desalado y cocinado, bien desmigado","50 g de patata cocida","30 g de zanahoria cocida (de la crema, antes de triturar)","Perejil picado","1 huevo batido y pan rallado","Spray de aceite"],
+    steps:["Si el bacalao está salado para él, desálalo un poco más en agua antes de cocinarlo.","Chafa el bacalao con la patata, la zanahoria y el perejil.","Forma 6 tortitas aplastadas, pásalas por huevo y pan rallado y pulveriza aceite.","Airfryer a 190 °C, 8–10 minutos, dando la vuelta a mitad. La crema sírvesela en un vaso para beber."]}
+};
+const DAYS = Object.keys(D);
+const WD = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+const WS = ["D","L","M","X","J","V","S"];
+const MON = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad = n => String(n).padStart(2,"0");
+const iso = d => d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const parse = s => { const [y,m,d] = s.split("-").map(Number); return new Date(y,m-1,d); };
+const todayIso = iso(new Date());
+let sel = DAYS.includes(todayIso) ? todayIso : (todayIso < DAYS[0] ? DAYS[0] : DAYS[DAYS.length-1]);
+
+let db = null, trainDone = {}, offMap = {};
+try{ offMap = JSON.parse(localStorage.getItem("comidas-v1")||"{}"); }catch(e){ offMap = {}; }
+
+/* ---------- training logic ---------- */
+function hisSession(dateIso){
+  const d = parse(dateIso), base = new Date(2026,10,23);
+  const diff = Math.round((d - base)/864e5), week = Math.floor(diff/7), dow = d.getDay();
+  const alt = ((week % 2) + 2) % 2 === 0 ? ["A","B","A"] : ["B","A","B"];
+  const idx = {1:0,3:1,5:2}[dow];
+  if (idx !== undefined) return {kind:"fuerza", s: alt[idx]};
+  if (dow === 2 || dow === 4) return {kind:"paseo", t:"Paseo de 40 min"};
+  if (dow === 6) return {kind:"paseo", t:"Paseo largo"};
+  return {kind:"descanso", t:"Descanso"};
+}
+
+function portions(r){
+  const row = r.rows[0], heads = r.heads;
+  const cls = {"Él":"p-him","Ella":"p-her","Niño":"p-kid"};
+  return heads.map((h,i)=>`<span class="pill ${cls[h]}">${esc(h)} ${esc(row[i+1])}</span>`).join("");
+}
+
+/* ---------- views ---------- */
+function renderHoy(){
+  const el = document.getElementById("v-hoy");
+  const d = parse(sel), day = D[sel];
+  let h = `<div class="strip" role="group" aria-label="Días de la semana">`;
+  for (const k of DAYS){ const x = parse(k);
+    h += `<button class="day${k===todayIso?" today":""}" data-day="${k}" aria-pressed="${k===sel}"><span>${WS[x.getDay()]}</span><b>${x.getDate()}</b></button>`; }
+  h += `</div>`;
+  h += `<div class="datehead"><div class="k">${sel===todayIso?"Hoy":(sel===iso(new Date(Date.now()+864e5))?"Mañana":"&nbsp;")}</div><h1>${WD[d.getDay()][0].toUpperCase()+WD[d.getDay()].slice(1)} ${d.getDate()} de ${MON[d.getMonth()]}</h1></div>`;
+  if (T[sel]) h += `<div class="thaw" role="note"><h3>Esta noche, pasa del congelador a la nevera</h3><ul>${T[sel].map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div>`;
+  h += `<h2>Comida y cena</h2>`;
+  if (!day){ h += `<div class="empty">Fin de semana sin menú planificado.</div>`; }
+  else {
+    h += day.c ? mealBlock("c", "Comida", day.c) : `<div class="empty">Comida de los adultos sin planificar.</div>`;
+    h += day.x ? mealBlock("x", "Cena", day.x) : "";
+    if (day.g) h += `<div class="kidline"><b>En la guarde</b><span>${esc(day.g)}</span></div>`;
+  }
+  const hs = hisSession(sel), done = trainDone[sel] || {};
+  h += `<h2>Entreno</h2><div class="train">`;
+  h += `<div class="tcard" style="--c:var(--him)"><div class="who">Él</div>`;
+  if (hs.kind === "fuerza"){ const s = X[hs.s];
+    h += `<h3>${esc(s.name)}</h3><ul>${s.ex.slice(0,4).map(e=>`<li>${esc(e[0])}</li>`).join("")}<li class="muted">y ${s.ex.length-4} más</li></ul>
+          <p><button class="linkbtn" data-sess="${hs.s}">Ver la sesión completa</button></p>`;
+  } else h += `<h3>${esc(hs.t)}</h3><p class="small muted">${hs.kind==="paseo"?"Mejor si es en familia, con el carro.":"Recupera para la próxima sesión."}</p>`;
+  if (hs.kind !== "descanso") h += `<button class="check" data-done="el" aria-pressed="${!!done.el}">${done.el?"✓ Hecho":"Marcar como hecho"}</button>`;
+  h += `</div>`;
+  h += `<div class="tcard" style="--c:var(--her)"><div class="who">Ella</div><h3>Recuperación · fase 0</h3><ul>${X.f0.map(e=>`<li>${esc(e[0])}</li>`).join("")}</ul>
+        <p><button class="linkbtn" data-her="1">Ver cómo hacerlo</button></p>
+        <button class="check" data-done="ella" aria-pressed="${!!done.ella}">${done.ella?"✓ Hecho":"Marcar como hecho"}</button></div>`;
+  h += `</div>`;
+  el.innerHTML = h;
+  const s = el.querySelector('.day[aria-pressed="true"]'), st = el.querySelector('.strip'); if (s && st) st.scrollLeft = s.offsetLeft - st.clientWidth/2 + s.clientWidth/2;
+}
+function mealCard(label, id){
+  const r = R[id];
+  label += r.heads.length === 3 ? " de los tres" : " de los adultos";
+  return `<button class="meal" data-r="${id}"><span class="go">Receta</span><div class="when">${esc(label)} · ${esc(r.time)}</div><h3>${esc(r.name)}</h3><div class="portions">${portions(r)}</div>${KV[id]?`<div class="kidv">Para el niño: ${esc(KV[id].n)} (airfryer)</div>`:""}</button>`;
+}
+
+function mealBlock(kind, label, id){
+  const off = offMap[sel + "_" + kind];
+  if (off && off.t){
+    const what = off.t === "tupper" ? "Comemos de tupper" : "Comemos fuera de casa";
+    return `<div class="offcard"><div class="when">${esc(label)} · no seguimos el menú</div><h3>${what}</h3>
+      <label class="small muted" for="note-${kind}">Nota</label><input id="note-${kind}" data-note="${kind}" placeholder="Qué vais a comer (opcional)" value="${esc(off.n || "")}">
+      <p class="small muted">Menú previsto: <button class="linkbtn" data-r="${id}">${esc(R[id].name)}</button></p>
+      <button class="chip main" data-unskip="${kind}">Volver al menú</button></div>`;
+  }
+  return mealCard(label, id) + `<div class="skip"><span class="small muted">¿No seguimos el menú?</span><button class="chip" data-skip="${kind}" data-t="tupper">Tupper</button><button class="chip" data-skip="${kind}" data-t="fuera">Comemos fuera</button></div>`;
+}
+async function setOff(kind, val){
+  const key = sel + "_" + kind;
+  if (val) offMap[key] = val; else delete offMap[key];
+  renderHoy();
+  if (db){ try{ const ref = db.collection("comidas").doc(key); if (val) await ref.set(val); else await ref.delete(); }catch(e){} }
+  else { try{ localStorage.setItem("comidas-v1", JSON.stringify(offMap)); }catch(e){} }
+}
+document.addEventListener("change", e=>{
+  const k = e.target.dataset && e.target.dataset.note; if (!k) return;
+  const cur = offMap[sel + "_" + k]; if (!cur) return;
+  setOff(k, {...cur, n: e.target.value.trim()});
+});
+
+function renderRecetas(){
+  let h = `<h1>Recetas</h1><p class="muted">Pesos de carne y pescado en crudo y limpio; arroz en crudo; legumbre cocida y escurrida.</p>
+  <details class="tips"><summary>Trucos para que coma verdura</summary><ul>
+    <li>Pon en el plato algo que ya le guste junto a una cantidad pequeña de la verdura nueva. A veces hacen falta 10 o 15 intentos para que la acepte.</li>
+    <li>Que la verdura vaya «escondida» en nuggets, galletas o tortitas, y también a la vista en trocitos: así se acostumbra a verla.</li>
+    <li>Las salsas para mojar ayudan mucho: yogur natural, tomate rallado o crema de calabaza.</li>
+    <li>Déjale ayudar: rebozar, aplastar las galletas o echar el queso.</li>
+    <li>Comed lo mismo que él y sin presionar ni premiar con el postre: la presión suele hacer que la rechace más.</li>
+  </ul></details>`;
+  for (const k of DAYS){ const day = D[k]; if (!day) continue; const d = parse(k);
+    h += `<div class="rgroup"><h2>${WD[d.getDay()][0].toUpperCase()+WD[d.getDay()].slice(1)} ${d.getDate()}</h2>`;
+    for (const [lab,id] of [["Comida",day.c],["Cena",day.x]]) if (id) h += `<button class="rrow" data-r="${id}"><b>${esc(R[id].name)}</b><span>${lab}</span></button>`;
+    h += `</div>`; }
+  document.getElementById("v-recetas").innerHTML = h;
+}
+
+function sessTable(key){
+  const s = X[key];
+  return `<div class="wrap"><table><thead><tr><th>Ejercicio</th><th>Series</th><th>Pausa</th></tr></thead><tbody>${
+    s.ex.map(e=>`<tr><td><b>${esc(e[0])}</b><div class="small muted">${esc(e[3])}</div></td><td>${esc(e[1])}</td><td>${esc(e[2])}</td></tr>`).join("")}</tbody></table></div>`;
+}
+function renderEntreno(){
+  let h = `<h1>Entreno en casa</h1>`;
+  h += `<h2 style="color:var(--him)">Él · 3 días de fuerza</h2><p class="small">Lunes, miércoles y viernes: una semana A–B–A y la siguiente B–A–B. Martes y jueves, paseo de 40 min; sábado, paseo largo.</p>`;
+  h += `<p class="small"><b>Calentamiento.</b> ${esc(X.warm)}</p>`;
+  h += `<h3 style="margin-top:16px">Fuerza A</h3>${sessTable("A")}<h3 style="margin-top:18px">Fuerza B</h3>${sessTable("B")}`;
+  h += `<p class="small"><b>Progresión.</b> ${esc(X.prog)}</p>`;
+  h += herBlock();
+  document.getElementById("v-entreno").innerHTML = h;
+}
+function herBlock(){
+  let h = `<h2 id="ella" style="color:var(--her)">Ella · por fases</h2><div class="flag small">${esc(X.flags)}</div>`;
+  h += `<h3>Fase 0 · semanas 0–6</h3><div class="wrap"><table><tbody>${X.f0.map(e=>`<tr><td><b>${esc(e[0])}</b><div class="small muted">${esc(e[2])}</div></td><td class="small">${esc(e[1])}</td></tr>`).join("")}</tbody></table></div>
+        <p class="small muted">En esta fase, nada de crunch, planchas, rueda abdominal, comba, correr ni cargar peso más allá del bebé.</p>`;
+  h += `<h3 style="margin-top:16px">Fase 1 · semanas 6–12, con el visto bueno de la revisión</h3><p class="small">3 días de 25–30 min y paseo casi a diario.</p>
+        <div class="wrap"><table><tbody>${X.f1.map(e=>`<tr><td>${esc(e[0])}</td><td>${esc(e[1])}</td></tr>`).join("")}</tbody></table></div>`;
+  h += `<h3 style="margin-top:16px">Fase 2 · desde la semana 12</h3><p class="small">Si la fisio da el visto bueno, A y B alternos, 35–40 min.</p>
+        <div class="wrap"><table><thead><tr><th>Fuerza A</th><th>Fuerza B</th></tr></thead><tbody>${X.f2a.map((a,i)=>`<tr><td>${esc(a)}</td><td>${esc(X.f2b[i])}</td></tr>`).join("")}</tbody></table></div>
+        <p class="small muted">Comba, correr y saltos, solo tras la valoración del suelo pélvico.</p>`;
+  return h;
+}
+
+/* ---------- recipe sheet ---------- */
+const sheet = document.getElementById("sheet"), sheetIn = document.getElementById("sheet-in");
+let lastFocus = null;
+function openSheet(html){
+  lastFocus = document.activeElement;
+  sheetIn.innerHTML = `<div class="sheetbar"><button class="close" data-close>Cerrar</button></div>` + html;
+  sheet.hidden = false; sheet.scrollTop = 0; document.body.style.overflow = "hidden";
+  sheet.querySelector("[data-close]").focus();
+}
+function closeSheet(){ sheet.hidden = true; document.body.style.overflow = ""; if (lastFocus) lastFocus.focus(); }
+function openRecipe(id){
+  const r = R[id]; const hc = {"Él":"h-him","Ella":"h-her","Niño":"h-kid"};
+  openSheet(`<p class="muted">${esc(r.day)} · ${esc(r.meal)} · ${esc(r.time)}</p><h1 id="sheet-title">${esc(r.name)}</h1>
+    <h2>En el plato</h2><div class="wrap"><table><thead><tr><th></th>${r.heads.map(x=>`<th class="${hc[x]}">${esc(x)}</th>`).join("")}</tr></thead>
+    <tbody>${r.rows.map(row=>`<tr>${row.map((c,i)=>i?`<td>${esc(c)}</td>`:`<th scope="row">${esc(c)}</th>`).join("")}</tr>`).join("")}</tbody></table></div>
+    <h2>Ingredientes</h2><ul class="ing">${r.ing.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+    <h2>Paso a paso</h2><ol class="steps">${r.steps.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>
+    ${r.nino?`<div class="note"><b>Para el niño.</b> ${esc(r.nino)}</div>`:""}
+    ${KV[id]?`<div class="kidrec"><p class="small muted">Versión para el niño en airfryer · ${esc(KV[id].y)}</p><h2>${esc(KV[id].n)}</h2><ul>${KV[id].ing.map(x=>`<li>${esc(x)}</li>`).join("")}</ul><ol>${KV[id].steps.map(x=>`<li>${esc(x)}</li>`).join("")}</ol><p class="small">Déjalos templar antes de dárselos: por dentro queman. Si sobran, se congelan ya hechos y se recalientan 4–5 minutos a 180 °C.</p></div>`:""}`);
+}
+function openSession(k){ openSheet(`<p class="muted">Él · unos 45 min</p><h1 id="sheet-title">${esc(X[k].name)}</h1><p class="small"><b>Calentamiento.</b> ${esc(X.warm)}</p>${sessTable(k)}<p class="small"><b>Progresión.</b> ${esc(X.prog)}</p>`); }
+function openHer(){ openSheet(`<h1 id="sheet-title" style="color:var(--her)">Recuperación de ella</h1>` + herBlock().replace(/<h2[^>]*>.*?<\/h2>/,"")); }
+
+/* ---------- shopping ---------- */
+let items = [], shopNote = "Cargando la lista…", shopLocal = false;
+const LS = "compra-local-v1";
+function renderCompra(){
+  const el = document.getElementById("v-compra");
+  const left = items.filter(i=>!i.done).length;
+  let h = `<h1>Compra</h1><p class="status" id="shopstatus">${esc(shopNote)}</p>`;
+  h += `<form class="add" id="addform"><label class="small" for="nm" style="position:absolute;left:-9999px">Producto</label><input id="nm" placeholder="Añadir producto" autocomplete="off"><input id="qt" class="q" placeholder="Cantidad" autocomplete="off"><button class="btn" type="submit">Añadir</button></form>`;
+  h += `<p class="small muted">${items.length ? `${left} por comprar de ${items.length}` : "La lista está vacía. Añade lo que haga falta."}</p>`;
+  const secs = {}; for (const it of items){ (secs[it.s||"Otros"] ||= []).push(it); }
+  for (const [s,arr] of Object.entries(secs)){
+    h += `<div class="sec">${esc(s)}</div>`;
+    for (const it of arr) h += `<button class="item${it.done?" done":""}" data-item="${esc(it.id)}" aria-pressed="${!!it.done}"><span class="box" aria-hidden="true">${it.done?"✓":""}</span><span class="nm">${esc(it.n)}</span><span class="qq">${esc(it.q||"")}</span></button>`;
+  }
+  h += `<div class="tools"><button class="btn ghost" id="clearDone">Quitar lo comprado</button><button class="btn ghost" id="uncheck">Desmarcar todo</button></div>`;
+  el.innerHTML = h;
+}
+async function toggleItem(id){
+  const it = items.find(i=>i.id===id); if (!it) return;
+  if (db){ try{ await db.collection("compra").doc(id).update({done:!it.done}); }catch(e){ flash("No se pudo guardar el cambio. Revisa la conexión."); } }
+  else { it.done = !it.done; saveLocal(); renderCompra(); }
+}
+async function addItem(n,q){
+  const o = (items.reduce((m,i)=>Math.max(m,i.o||0),0)) + 10;
+  const body = {n, q, s:"Añadido", done:false, o};
+  if (db){ try{ await db.collection("compra").add(body); }catch(e){ flash("No se pudo añadir. Revisa la conexión."); } }
+  else { items.push({...body, id:"l"+Date.now()}); saveLocal(); renderCompra(); }
+}
+async function clearDone(){
+  const done = items.filter(i=>i.done); if (!done.length) return;
+  if (!confirm(`¿Quitar ${done.length} productos ya comprados de la lista?`)) return;
+  if (db){ for (const i of done){ try{ await db.collection("compra").doc(i.id).delete(); }catch(e){ flash("No se pudieron quitar todos."); break; } } }
+  else { items = items.filter(i=>!i.done); saveLocal(); renderCompra(); }
+}
+async function uncheckAll(){
+  const done = items.filter(i=>i.done); if (!done.length) return;
+  if (db){ for (const i of done){ try{ await db.collection("compra").doc(i.id).update({done:false}); }catch(e){ flash("No se pudieron desmarcar todos."); break; } } }
+  else { items.forEach(i=>i.done=false); saveLocal(); renderCompra(); }
+}
+function saveLocal(){ try{ localStorage.setItem(LS, JSON.stringify(items)); }catch(e){} }
+function loadLocal(){ try{ items = JSON.parse(localStorage.getItem(LS)||"[]"); }catch(e){ items = []; } }
+function flash(t){ shopNote = t; const s = document.getElementById("shopstatus"); if (s) s.textContent = t; }
+
+/* ---------- progreso ---------- */
+let meds = [], perf = {}, who = "ella";
+const WHO = {ella:{n:"Ella",c:"var(--her)"}, el:{n:"Él",c:"var(--him)"}};
+const MS = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+const fmtD = s => { const d = parse(s); return d.getDate()+" "+MS[d.getMonth()]; };
+const nf = (x,d=1) => (x==null || isNaN(x)) ? "—" : Number(x).toLocaleString("es-ES",{minimumFractionDigits:d,maximumFractionDigits:d});
+const num = v => { if (v==null) return null; const x = parseFloat(String(v).replace(",",".")); return isNaN(x) ? null : x; };
+function medsOf(w){ return meds.filter(m=>m.who===w).sort((a,b)=> a.d<b.d ? -1 : a.d>b.d ? 1 : 0); }
+function spark(list, key, color){
+  const pts = list.filter(m=>typeof m[key]==="number");
+  if (pts.length < 2) return `<p class="small muted">Con dos medidas o más veréis aquí la evolución del peso.</p>`;
+  const W=280,H=70,p=6, vs=pts.map(m=>m[key]), mn=Math.min(...vs), mx=Math.max(...vs), r=(mx-mn)||1;
+  const xy = pts.map((m,i)=>[p+i*(W-2*p)/(pts.length-1), H-p-(m[key]-mn)/r*(H-2*p)]);
+  return `<svg viewBox="0 0 ${W} ${H}" class="spark" role="img" aria-label="Evolución del peso"><polyline fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" points="${xy.map(a=>a[0].toFixed(1)+","+a[1].toFixed(1)).join(" ")}"/>${xy.map(a=>`<circle cx="${a[0].toFixed(1)}" cy="${a[1].toFixed(1)}" r="3" fill="${color}"/>`).join("")}</svg>`;
+}
+function delta(a, b, unit, goodDown){
+  if (a==null || b==null) return "";
+  const x = b - a; if (Math.abs(x) < 0.05) return `<span class="dl">= ${unit}</span>`;
+  const good = goodDown ? x < 0 : x > 0;
+  return `<span class="dl ${good?"good":"bad"}">${x<0?"−":"+"}${nf(Math.abs(x))} ${unit}</span>`;
+}
+function weekTrainCount(w){
+  const t = new Date(), dow = (t.getDay()+6)%7; let c = 0;
+  for (let i=0;i<7;i++){ const k = iso(new Date(t.getFullYear(), t.getMonth(), t.getDate()-dow+i)); if (trainDone[k] && trainDone[k][w]) c++; }
+  return c;
+}
+function personCard(w){
+  const L = medsOf(w), first = L[0], last = L[L.length-1], h = num((perf[w]||{}).h);
+  let s = `<div class="pcard" style="--c:${WHO[w].c}"><div class="who">${WHO[w].n}</div>`;
+  if (!last) s += `<p class="muted small">Todavía no hay medidas.</p>`;
+  else {
+    const fk = (last.peso!=null && last.grasa!=null) ? last.peso*last.grasa/100 : null;
+    const fk0 = (first.peso!=null && first.grasa!=null) ? first.peso*first.grasa/100 : null;
+    const lean = fk!=null ? last.peso - fk : null, lean0 = fk0!=null ? first.peso - fk0 : null;
+    const imc = (h && last.peso) ? last.peso/((h/100)**2) : null;
+    s += `<div class="big">${nf(last.peso)} <small>kg</small></div><div class="small muted">Última medida: ${fmtD(last.d)}</div>
+      <div class="kv"><span>Grasa</span><b>${nf(last.grasa)} %</b><span>Masa grasa</span><b>${nf(fk)} kg</b><span>Masa magra</span><b>${nf(lean)} kg</b>${last.musculo!=null?`<span>Masa muscular</span><b>${nf(last.musculo)} kg</b>`:""}${imc?`<span>IMC</span><b>${nf(imc)}</b>`:""}${last.visceral!=null?`<span>Grasa visceral</span><b>${nf(last.visceral)}</b>`:""}${last.agua!=null?`<span>Agua</span><b>${nf(last.agua)} %</b>`:""}</div>`;
+    if (L.length > 1) s += `<div class="deltas"><div>Desde el ${fmtD(first.d)}</div>${delta(first.peso,last.peso,"kg",true)}${delta(fk0,fk,"kg grasa",true)}${delta(lean0,lean,"kg magra",false)}</div>`;
+    s += spark(L, "peso", WHO[w].c);
+  }
+  s += `<p class="small">Entrenos marcados esta semana: <b>${weekTrainCount(w)}</b></p>`;
+  s += `<label class="small muted">Altura (cm)<input class="hin" data-h="${w}" inputmode="decimal" value="${h?esc(h):""}" placeholder="—"></label></div>`;
+  return s;
+}
+function renderProgreso(){
+  const el = document.getElementById("v-progreso");
+  if (el.contains(document.activeElement) && document.activeElement.tagName === "INPUT") return;
+  let h = `<h1>Progreso</h1><p class="small muted">Pesaos el mismo día de la semana, en ayunas y después de ir al baño: así las medidas se comparan bien. Tras el parto, el agua corporal cambia mucho y la grasa que marca la báscula baila: fijaos en la tendencia de varias semanas, no en un día.</p>`;
+  h += `<div class="pgrid">${personCard("ella")}${personCard("el")}</div>`;
+  h += `<h2>Nueva medida</h2><form id="medform" class="medform" style="--c:${WHO[who].c}">
+    <div class="seg" role="group" aria-label="De quién es la medida">${Object.keys(WHO).map(w=>`<button type="button" data-pick="${w}" aria-pressed="${w===who}">${WHO[w].n}</button>`).join("")}</div>
+    <div class="fgrid">
+      <label>Fecha<input type="date" id="m-d" value="${todayIso}"></label>
+      <label>Peso (kg)<input id="m-peso" inputmode="decimal" placeholder="72,3"></label>
+      <label>Grasa (%)<input id="m-grasa" inputmode="decimal" placeholder="24,3"></label>
+      <label>Masa muscular (kg)<input id="m-musculo" inputmode="decimal" placeholder="Opcional"></label>
+      <label>Agua (%)<input id="m-agua" inputmode="decimal" placeholder="Opcional"></label>
+      <label>Grasa visceral<input id="m-visceral" inputmode="decimal" placeholder="Opcional"></label>
+      <label class="full">Nota<input id="m-nota" placeholder="Cómo te sientes, qué has notado…"></label>
+    </div>
+    <div class="calc" id="m-calc">Escribe peso y grasa para ver tu masa grasa y masa magra.</div>
+    <button class="btn" type="submit">Guardar medida</button></form>`;
+  h += `<h2>Historial</h2>`;
+  for (const w of Object.keys(WHO)){
+    const L = medsOf(w).slice().reverse();
+    h += `<h3 style="color:${WHO[w].c};margin-top:12px">${WHO[w].n}</h3><div class="hist">${L.length ? L.map(m=>`<div class="hrow"><span class="d">${fmtD(m.d)}</span><span>${nf(m.peso)} kg · ${nf(m.grasa)} %${m.nota?` · <span class="muted">${esc(m.nota)}</span>`:""}</span><button class="x" data-delmed="${esc(m.id)}" aria-label="Borrar medida del ${fmtD(m.d)}">✕</button></div>`).join("") : `<p class="small muted">Sin medidas.</p>`}</div>`;
+  }
+  el.innerHTML = h;
+}
+function updateCalc(){
+  const p = num(document.getElementById("m-peso")?.value), g = num(document.getElementById("m-grasa")?.value), c = document.getElementById("m-calc");
+  if (!c) return;
+  if (p && g!=null){ const fk = p*g/100; c.innerHTML = `Masa grasa <b>${nf(fk)} kg</b> · masa magra <b>${nf(p-fk)} kg</b>`; }
+  else c.textContent = "Escribe peso y grasa para ver tu masa grasa y masa magra.";
+}
+document.addEventListener("input", e=>{ if (e.target.id==="m-peso" || e.target.id==="m-grasa") updateCalc(); });
+document.addEventListener("submit", async e=>{
+  if (e.target.id !== "medform") return; e.preventDefault();
+  const v = id => document.getElementById(id).value;
+  const m = {who, d: v("m-d") || todayIso, peso: num(v("m-peso")), grasa: num(v("m-grasa")), musculo: num(v("m-musculo")), agua: num(v("m-agua")), visceral: num(v("m-visceral")), nota: v("m-nota").trim()};
+  if (m.peso == null){ document.getElementById("m-calc").textContent = "Falta el peso."; document.getElementById("m-peso").focus(); return; }
+  for (const k of Object.keys(m)) if (m[k] === null || m[k] === "") delete m[k];
+  document.activeElement.blur();
+  if (db){ try{ await db.collection("medidas").add(m); }catch(err){ document.getElementById("m-calc").textContent = "No se pudo guardar. Revisa la conexión."; return; } }
+  else { meds.push({...m, id:"l"+Date.now()}); try{ localStorage.setItem("medidas-v1", JSON.stringify(meds)); }catch(err){} renderProgreso(); }
+});
+document.addEventListener("change", async e=>{
+  const w = e.target.dataset && e.target.dataset.h; if (!w) return;
+  const h = num(e.target.value); perf[w] = {h};
+  if (db){ try{ await db.collection("perfiles").doc(w).set({h}); }catch(err){} }
+  else { try{ localStorage.setItem("perfiles-v1", JSON.stringify(perf)); }catch(err){} }
+  e.target.blur(); renderProgreso();
+});
+async function delMed(id){
+  if (!confirm("¿Borrar esta medida?")) return;
+  if (db){ try{ await db.collection("medidas").doc(id).delete(); }catch(err){} }
+  else { meds = meds.filter(m=>m.id!==id); try{ localStorage.setItem("medidas-v1", JSON.stringify(meds)); }catch(err){} renderProgreso(); }
+}
+
+/* ---------- routing & events ---------- */
+const VIEWS = ["hoy","recetas","entreno","compra","progreso"];
+function route(){
+  const v = VIEWS.includes(location.hash.slice(1)) ? location.hash.slice(1) : "hoy";
+  for (const k of VIEWS) document.getElementById("v-"+k).hidden = k!==v;
+  document.querySelectorAll("nav.tabs a").forEach(a=>{ if (a.dataset.v===v) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current"); });
+  window.scrollTo(0,0);
+}
+window.addEventListener("hashchange", route);
+document.addEventListener("click", async e=>{
+  const t = e.target.closest("button"); if (!t) return;
+  if (t.dataset.day){ sel = t.dataset.day; renderHoy(); }
+  else if (t.dataset.r) openRecipe(t.dataset.r);
+  else if (t.dataset.sess) openSession(t.dataset.sess);
+  else if (t.dataset.her) openHer();
+  else if ("close" in t.dataset) closeSheet();
+  else if (t.dataset.item) toggleItem(t.dataset.item);
+  else if (t.id === "clearDone") clearDone();
+  else if (t.id === "uncheck") uncheckAll();
+  else if (t.dataset.done) toggleTrain(t.dataset.done);
+  else if (t.dataset.skip) setOff(t.dataset.skip, {t: t.dataset.t, n: ""});
+  else if (t.dataset.unskip) setOff(t.dataset.unskip, null);
+  else if (t.dataset.pick){ who = t.dataset.pick; const f = document.getElementById("medform"); f.style.setProperty("--c", WHO[who].c); f.querySelectorAll("[data-pick]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.pick===who)); }
+  else if (t.dataset.delmed) delMed(t.dataset.delmed);
+});
+document.addEventListener("submit", e=>{
+  if (e.target.id !== "addform") return; e.preventDefault();
+  const n = document.getElementById("nm").value.trim(), q = document.getElementById("qt").value.trim();
+  if (!n) return; addItem(n,q); document.getElementById("nm").value=""; document.getElementById("qt").value="";
+  document.getElementById("nm").focus();
+});
+document.addEventListener("keydown", e=>{ if (e.key==="Escape" && !sheet.hidden) closeSheet(); });
+
+async function toggleTrain(who){
+  const cur = trainDone[sel] || {}; const val = !cur[who];
+  trainDone[sel] = {...cur, [who]:val}; renderHoy();
+  if (db){ try{ await db.collection("entrenos").doc(sel).set({...cur, [who]:val}); }catch(e){} }
+  else { try{ localStorage.setItem("entrenos-v1", JSON.stringify(trainDone)); }catch(e){} }
+}
+
+/* ---------- boot ---------- */
+try{ trainDone = JSON.parse(localStorage.getItem("entrenos-v1")||"{}"); }catch(e){ trainDone = {}; }
+try{ meds = JSON.parse(localStorage.getItem("medidas-v1")||"[]"); perf = JSON.parse(localStorage.getItem("perfiles-v1")||"{}"); }catch(e){}
+renderHoy(); renderRecetas(); renderEntreno(); renderProgreso(); loadLocal(); shopLocal = true;
+shopNote = "Conectando la lista compartida…"; renderCompra(); route();
+
+(async ()=>{
+  let api = null;
+  try { api = await (window.claude && window.claude.use ? window.claude.use("db") : null); } catch(e){ api = null; }
+  if (!api){ shopNote = "Por ahora la lista se guarda solo en este móvil. En la lección 2 la compartimos entre los dos."; renderCompra(); return; }
+  db = api;
+  const timer = setTimeout(()=>{ flash("No se puede conectar con la lista compartida ahora mismo; puede estar desactualizada."); }, 10000);
+  db.collection("compra").orderBy("o").onSnapshot(snap=>{
+    if (!snap.metadata.fromCache) clearTimeout(timer);
+    items = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    shopNote = snap.metadata.fromCache ? "Sincronizando…" : "Lista compartida: los cambios se ven al momento en ambos móviles.";
+    renderCompra();
+  }, err=>{ clearTimeout(timer); flash("No se pudo cargar la lista compartida."); });
+  db.collection("medidas").onSnapshot(snap=>{ meds = snap.docs.map(d=>({id:d.id, ...d.data()})); renderProgreso(); }, ()=>{});
+  db.collection("perfiles").onSnapshot(snap=>{ const m = {}; snap.docs.forEach(d=>{ m[d.id] = d.data(); }); perf = m; renderProgreso(); }, ()=>{});
+  db.collection("comidas").onSnapshot(snap=>{
+    const m = {}; snap.docs.forEach(d=>{ m[d.id] = d.data(); }); offMap = m;
+    const a = document.activeElement; if (!(a && a.dataset && a.dataset.note)) renderHoy();
+  }, ()=>{});
+  db.collection("entrenos").onSnapshot(snap=>{
+    const m = {}; snap.docs.forEach(d=>{ m[d.id] = d.data(); }); trainDone = m; renderHoy(); renderProgreso();
+  }, ()=>{});
+})();
+</script>
+</body>
+</html>
